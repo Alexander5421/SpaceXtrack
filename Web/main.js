@@ -91,6 +91,19 @@ function updateChart(rows) {
                         offset: true,
                         grid: {
                             display: false
+                        },
+                        afterBuildTicks: function(scale) {
+                            const datasetLength = scale.chart.data.datasets[0].data.length;
+                            scale.ticks.forEach((tick, index) => {
+                                tick.color = index < datasetLength ? '#000' : '#ccc'; // grey color for the future months
+                            });
+                        },
+                        ticks: {
+                            // Use a function to set the color dynamically
+                            color: function(context) {
+                                // Return the color assigned during the afterBuildTicks phase
+                                return context.tick.color;
+                            }
                         }
                     }
                 },
