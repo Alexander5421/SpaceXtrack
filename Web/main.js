@@ -3,9 +3,10 @@ let chart;
 let currYear = new Date().getFullYear();
 let CurrMonth = new Date().getMonth() + 1;
 let displayYear;
+import apiKey from './config.js';
+
 async function fetchDataAndDisplayChart() {
     const sheetId = '1mXaJ40SvLBtVkxXvl7pbHRWhjPC8ZOleaqJ9fR8xH7g';
-    const apiKey = 'AIzaSyCBI1uJ1lgwOKXJxoU3cuiWTQiAsyfbT0o';
     const range = 'Test!A:C';
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
 
