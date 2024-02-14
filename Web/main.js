@@ -75,7 +75,15 @@ function updateChart(thisYearRows, lastYearRows) {
     // log this year and last year sum of launch counts
     console.log(thisYearlaunchCounts.reduce((a, b) => parseInt(a) + parseInt(b), 0));
     console.log(lastYearlaunchCounts.reduce((a, b) => parseInt(a) + parseInt(b), 0));
-    
+    // create a new data that is the increase rate of this year
+    var increaseRate = thisYearlaunchCounts.map(function (e, i) {
+        if (parseInt(lastYearlaunchCounts[i]) === 0) {
+            return NaN;
+        }
+        var rate = (parseInt(e) - parseInt(lastYearlaunchCounts[i])) / parseInt(lastYearlaunchCounts[i]);
+        return parseFloat((rate * 100).toFixed(1));
+    });
+    // log the increase rate
 
 
     var maxLaunchCount = Math.max(...thisYearlaunchCounts, ...lastYearlaunchCounts);
@@ -128,6 +136,12 @@ function updateChart(thisYearRows, lastYearRows) {
                         backgroundColor: thisYearBackGroundColor,
                         borderColor: thisYearBorderColor,
                         borderWidth: 1
+                    },
+                    {
+                        label: 'increase rate',
+                        data: increaseRate,
+                        type: 'line',
+                        yAxisID: 'y1',
                     }
                 ]
             },
@@ -141,6 +155,18 @@ function updateChart(thisYearRows, lastYearRows) {
                             stepSize: 1
                         }
                     },
+                    y1: {
+                        type: 'linear',
+                        position: 'right',
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            callback: function (value, index, values) {
+                                return value + '%';
+                            }
+                        }
+                    },
                     x: {
                         type: 'category',
                         offset: true,
@@ -148,7 +174,7 @@ function updateChart(thisYearRows, lastYearRows) {
                             display: false
                         },
                         afterBuildTicks: function (scale) {
-                            const datasetLength = scale.chart.data.datasets[0].data.length;
+                            const datasetLength = scale.chart.data.datasets[1].data.length;
                             scale.ticks.forEach((tick, index) => {
                                 tick.color = index < datasetLength ? '#000' : '#ccc'; // grey color for the future months
                             });
@@ -162,6 +188,17 @@ function updateChart(thisYearRows, lastYearRows) {
                         }
                     }
                 },
+                plugins: {
+                    datalabels: {
+                        formatter: function(value, context) {
+                            if (context.datasetIndex === 2) {
+                                return value + '%';
+                            }
+                        },
+                        anchor: 'end',
+                        align: 'end'
+                    }
+                },
                 maintainAspectRatio: false
             },
             plugins: [dottedBorderPlugin, ChartDataLabels]
@@ -172,11 +209,16 @@ function updateChart(thisYearRows, lastYearRows) {
         var dataset = chart.data.datasets[1];
         chart.data.datasets[0].data = lastYearlaunchCounts;
         chart.data.datasets[1].data = thisYearlaunchCounts;
+        if (currYear == displayYear) {
+            increaseRate.pop(); // Delete the last element in the increaseRate array
+        }
+        chart.data.datasets[2].data = increaseRate;
         chart.options.scales.y.max = yAxisMax;
         if (currYear == displayYear) {
             dataset.backgroundColor = new Array(dataset.data.length).fill(thisYearBackGroundColor);
             dataset.backgroundColor[CurrMonth - 1] = thisYearGreyColor; // Highlight the current month
             chart.options.plugins.dottedBorderPlugin = true;
+            
 
         } else {
             dataset.backgroundColor = new Array(dataset.data.length).fill(thisYearBackGroundColor);
