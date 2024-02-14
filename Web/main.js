@@ -72,6 +72,10 @@ function updateChart(thisYearRows, lastYearRows) {
     var lastYearlaunchCounts = lastYearRows.map(function (e) {
         return e[1]; // Launch Count
     });
+    // log this year and last year sum of launch counts
+    console.log(thisYearlaunchCounts.reduce((a, b) => parseInt(a) + parseInt(b), 0));
+    console.log(lastYearlaunchCounts.reduce((a, b) => parseInt(a) + parseInt(b), 0));
+    
 
 
     var maxLaunchCount = Math.max(...thisYearlaunchCounts, ...lastYearlaunchCounts);
@@ -160,7 +164,7 @@ function updateChart(thisYearRows, lastYearRows) {
                 },
                 maintainAspectRatio: false
             },
-            plugins: [dottedBorderPlugin]
+            plugins: [dottedBorderPlugin, ChartDataLabels]
         });
         chart.options.plugins.dottedBorderPlugin = false;
         chart.update();
