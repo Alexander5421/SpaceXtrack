@@ -188,6 +188,11 @@ function updateChart(thisYearRows, lastYearRows) {
                         }
                     }
                 },
+                layout: {
+                    padding: {
+                      top: 30 // Adjust the value as needed
+                    }
+                },
                 plugins: {
                     datalabels: {
                         formatter: function(value, context) {
@@ -197,7 +202,10 @@ function updateChart(thisYearRows, lastYearRows) {
                         },
                         anchor: 'end',
                         align: 'end'
-                    }
+                    },
+                    legend: {
+                        position: 'bottom' // or 'left'
+                      }
                 },
                 maintainAspectRatio: false
             },

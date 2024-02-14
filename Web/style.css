@@ -1,12 +1,39 @@
+body {
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+.space-themed {
+    background-color: #202030;
+    color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.records-list {
+    background-color: #fff;
+    color: #333;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+figure img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.navigation a {
+    color: #4f5d75;
+}
+
 .outbox {
     text-align: center;
 }
 
-.container {
+.container2 {
     width: 75%;
     display: inline-block;
 }
 
-#yearDropdown {
-    /* Add your styles for yearDropdown here */
-}
