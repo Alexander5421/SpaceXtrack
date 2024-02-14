@@ -1,3 +1,5 @@
 ﻿Chart.js
 Web/config.js
 Web/test
+Web/node_modules
+Web/.env

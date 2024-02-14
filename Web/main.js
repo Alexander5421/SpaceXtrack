@@ -8,17 +8,17 @@ let lastYearBackGroundColor = 'rgba(0, 123, 255, 0.6)';
 let thisYearBorderColor = 'rgba(255, 99, 132, 1)';
 let lastYearBorderColor = 'rgba(0, 123, 255, 1)';
 let thisYearGreyColor = 'rgba(255, 99, 132, 0.15)';
-import apiKey from './config.js';
-
+// import apiKey from './config.js';
 async function fetchDataAndDisplayChart() {
-    const sheetId = '1mXaJ40SvLBtVkxXvl7pbHRWhjPC8ZOleaqJ9fR8xH7g';
-    const range = 'Test!A:C';
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+    // const sheetId = '1mXaJ40SvLBtVkxXvl7pbHRWhjPC8ZOleaqJ9fR8xH7g';
+    // const range = 'Test!A:C';
+    // const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
 
     try {
-        const response = await fetch(url);
-        const data = await response.json();
-        var rows = data.values; // Assuming the first row is headers, and the rest are data
+        const response = await fetch('/api/sheet');
+        var rows = await response.json();
+        // cast rows to array
+        rows = rows.data;
         rows = rows.slice(1); // Remove the header row
 
         // Extract unique years from the data
