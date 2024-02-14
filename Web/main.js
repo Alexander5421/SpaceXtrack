@@ -3,6 +3,11 @@ let chart;
 let currYear = new Date().getFullYear();
 let CurrMonth = new Date().getMonth() + 1;
 let displayYear;
+let thisYearBackGroundColor = 'rgba(255, 99, 132, 0.6)';
+let lastYearBackGroundColor = 'rgba(0, 123, 255, 0.6)';
+let thisYearBorderColor = 'rgba(255, 99, 132, 1)';
+let lastYearBorderColor = 'rgba(0, 123, 255, 1)';
+let thisYearGreyColor = 'rgba(255, 99, 132, 0.15)';
 import apiKey from './config.js';
 
 async function fetchDataAndDisplayChart() {
@@ -35,15 +40,17 @@ async function fetchDataAndDisplayChart() {
         dropdown.addEventListener('change', function () {
             // Filter the data for the selected year
             const selectedYear = this.value;
-            const filteredRows = rows.filter(row => row[0].split('-')[0] === selectedYear);
+            const filteredRows = rows.filter(row => row[0].split('-')[0] == selectedYear);
+            const lastYearRows = rows.filter(row => row[0].split('-')[0] == (selectedYear - 1));
             displayYear = selectedYear;
             // Update the chart
-            updateChart(filteredRows);
+            updateChart(filteredRows, lastYearRows);
         });
 
         // Initial chart display for the selected year
-        const initialRows = rows.filter(row => row[0].split('-')[0] === dropdown.value);
-        updateChart(initialRows);
+        const initialRows = rows.filter(row => row[0].split('-')[0] == dropdown.value);
+        const initialLastYearRows = rows.filter(row => row[0].split('-')[0] == (dropdown.value - 1));
+        updateChart(initialRows, initialLastYearRows);
     } catch (error) {
         console.error('Error fetching data: ', error);
     }
@@ -52,47 +59,50 @@ async function fetchDataAndDisplayChart() {
 
 
 // Function to update the chart
-function updateChart(rows) {
+function updateChart(thisYearRows, lastYearRows) {
 
-    var labels = rows.map(function (e) {
+    var labels = thisYearRows.map(function (e) {
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const monthIndex = parseInt(e[0].split('-')[1]) - 1;
         return monthNames[monthIndex];
     });
-    var launchCounts = rows.map(function (e) {
+    var thisYearlaunchCounts = thisYearRows.map(function (e) {
+        return e[1]; // Launch Count
+    });
+    var lastYearlaunchCounts = lastYearRows.map(function (e) {
         return e[1]; // Launch Count
     });
 
 
-    var maxLaunchCount = Math.max(...launchCounts);
+    var maxLaunchCount = Math.max(...thisYearlaunchCounts, ...lastYearlaunchCounts);
     var yAxisMax = Math.ceil(maxLaunchCount * 1.2);
 
     const dottedBorderPlugin = {
         id: 'dottedBorderPlugin',
         afterDraw: (chart) => {
-          const ctx = chart.ctx;
-          const xAxis = chart.scales.x; // Adjust based on your axis ID
-          const yAxis = chart.scales.y; // Adjust based on your axis ID
-          // Specify the label or index of the x-value you want to highlight
-          const datasetIndex = 0; // Index of the dataset containing the bar to highlight
-      
-          // Find the bar corresponding to the specific label
-          const barMeta = chart.getDatasetMeta(datasetIndex).data[chart.getDatasetMeta(datasetIndex).data.length - 1];
-          if (!barMeta) return; // Bar not found
-      
-          // Dotted border settings
-          // grey color
-          ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)'; 
-          ctx.lineWidth = 2;
-          ctx.setLineDash([5, 5]); // Dotted line pattern: [lineLength, spaceLength]
-      
-          // Draw rectangle around the bar
-          ctx.strokeRect(barMeta.x - barMeta.width / 2, barMeta.y, barMeta.width, yAxis.bottom - barMeta.y);
-      
-          // Reset line dash to ensure other drawings are not affected
-          ctx.setLineDash([]);
+            const ctx = chart.ctx;
+            const xAxis = chart.scales.x; // Adjust based on your axis ID
+            const yAxis = chart.scales.y; // Adjust based on your axis ID
+            // Specify the label or index of the x-value you want to highlight
+            const datasetIndex = 1; // Index of the dataset containing the bar to highlight
+
+            // Find the bar corresponding to the specific label
+            const barMeta = chart.getDatasetMeta(datasetIndex).data[chart.getDatasetMeta(datasetIndex).data.length - 1];
+            if (!barMeta) return; // Bar not found
+
+            // Dotted border settings
+            // grey color
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]); // Dotted line pattern: [lineLength, spaceLength]
+
+            // Draw rectangle around the bar
+            ctx.strokeRect(barMeta.x - barMeta.width / 2, barMeta.y, barMeta.width, yAxis.bottom - barMeta.y);
+
+            // Reset line dash to ensure other drawings are not affected
+            ctx.setLineDash([]);
         }
-      };
+    };
 
 
     if (!chart) {
@@ -100,13 +110,22 @@ function updateChart(rows) {
             type: 'bar',
             data: {
                 labels: labels,
-                datasets: [{
-                    label: 'Launch Count',
-                    data: launchCounts,
-                    backgroundColor: 'rgba(0, 123, 255, 0.6)',
-                    borderColor: 'rgba(0, 123, 255, 1)',
-                    borderWidth: 1
-                }]
+                datasets: [
+                    {
+                        label: 'last year Launch Count',
+                        data: lastYearlaunchCounts,
+                        backgroundColor: lastYearBackGroundColor,
+                        borderColor: lastYearBorderColor,
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'this year Launch Count',
+                        data: thisYearlaunchCounts,
+                        backgroundColor: thisYearBackGroundColor,
+                        borderColor: thisYearBorderColor,
+                        borderWidth: 1
+                    }
+                ]
             },
             options: {
                 scales: {
@@ -146,16 +165,17 @@ function updateChart(rows) {
         chart.options.plugins.dottedBorderPlugin = false;
         chart.update();
     } else {
-        var dataset = chart.data.datasets[0];
-        chart.data.datasets[0].data = launchCounts;
+        var dataset = chart.data.datasets[1];
+        chart.data.datasets[0].data = lastYearlaunchCounts;
+        chart.data.datasets[1].data = thisYearlaunchCounts;
         chart.options.scales.y.max = yAxisMax;
         if (currYear == displayYear) {
-            dataset.backgroundColor = new Array(dataset.data.length).fill('rgba(0, 123, 255, 0.6)');
-            dataset.backgroundColor[CurrMonth - 1] = 'rgba(0, 123, 255, 0.15)'; // Highlight the current month
+            dataset.backgroundColor = new Array(dataset.data.length).fill(thisYearBackGroundColor);
+            dataset.backgroundColor[CurrMonth - 1] = thisYearGreyColor; // Highlight the current month
             chart.options.plugins.dottedBorderPlugin = true;
 
         } else {
-            dataset.backgroundColor = new Array(dataset.data.length).fill('rgba(0, 123, 255, 0.6)');
+            dataset.backgroundColor = new Array(dataset.data.length).fill(thisYearBackGroundColor);
             chart.options.plugins.dottedBorderPlugin = false;
         }
 
