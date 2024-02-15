@@ -33,7 +33,8 @@ figure img {
 }
 
 .container2 {
-    width: 75%;
+    height: auto;
+    width: 100%;
     display: inline-block;
 }
 
